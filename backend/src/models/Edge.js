@@ -35,5 +35,6 @@ const edgeSchema = new mongoose.Schema(
 
 edgeSchema.index({ app: 1 });
 edgeSchema.index({ source: 1, target: 1 });
+edgeSchema.index({ app: 1, source: 1, target: 1 }, { unique: true });
 
 module.exports = mongoose.model("Edge", edgeSchema);

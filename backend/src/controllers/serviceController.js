@@ -170,9 +170,16 @@ exports.updateMetrics = async (req, res, next) => {
 
     const { cpu, memory, requests, errors, latency } = req.body;
 
+    const update = {};
+    if (cpu !== undefined) update["runtime.cpu"] = cpu;
+    if (memory !== undefined) update["runtime.memory"] = memory;
+    if (requests !== undefined) update["runtime.requests"] = requests;
+    if (errors !== undefined) update["runtime.errors"] = errors;
+    if (latency !== undefined) update["runtime.latency"] = latency;
+
     const service = await Service.findOneAndUpdate(
       { _id: req.params.serviceId, app: app._id },
-      { runtime: { cpu, memory, requests, errors, latency } },
+      { $set: update },
       { new: true }
     );
 
