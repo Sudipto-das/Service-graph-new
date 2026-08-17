@@ -1,4 +1,5 @@
 const express = require("express");
+const path = require("path");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const helmet = require("helmet");
@@ -17,10 +18,13 @@ connectDB();
 
 const app = express();
 
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+const CORS_ORIGIN = process.env.CORS_ORIGIN || "http://localhost:5173";
+app.use(cors({ origin: CORS_ORIGIN, credentials: true }));
 app.use(helmet());
 app.use(express.json());
 app.use(cookieParser());
+
+app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/", (req, res) => {
   res.json({ message: "API is running..." });
@@ -31,7 +35,11 @@ app.use("/api/apps",appRoutes);
 app.use("/api/apps/:appId/services", serviceRoutes);
 app.use("/api/apps/:appId/edges", edgeRoutes);
 
-// Handle undefined routes
+app.get("/{*splat}", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+// Handle undefined API routes
 app.all("*path", (req, res, next) => {
   res.status(404).json({ message: `Route ${req.originalUrl} not found` });
 });
